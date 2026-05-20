@@ -1,0 +1,213 @@
+Dimension,Attributes,Data type,Identifier,notes
+DateDim,,,,
+,DateID,int,PK,
+,DateValue,Date,,
+,DateDay,Day,,
+,DateYear,Year,,
+,DateMonth,Month,,
+,,,,
+TimeDim,,,,
+,TimeID,int,PK,
+,TimeValue,Time,,
+,TimeHour,Hour,,
+,TimeMinute,Minute,,
+,TimeSecond,Second,,
+,,,,
+ChampionItemDim,,,,
+,ChampionItemID,int,PK,
+,ChampionItemName,varchar(55),,name of the item a champion can buy
+,ChampionItem1Perk,varchar(75),,perk per item
+,ChampionItem2Perk,varchar(75),,perk per item
+,ChampionItemPrice,int,not null,in game money
+,,,,
+ChampionDim,,,,
+,ChampionID,int,PK,
+,ChampionName,varchar(55),,a name
+,ChampionType,varchar(75),,"types can be tank,healer, assasin and more"
+,ChampionReleaseDate,date,,when this champion was released in game for the first time
+,,,,
+LocationDim,,,,
+,LocationID,,,
+,LocationCity,,,
+,LocationLatitude,,,
+,LocationLongitude,,,
+,Country,,,
+,,,,
+CoachDim,,,,
+,CoachID,int,PK,
+,CoachName,varchar(95),,
+,CoachYearsOfExperience,smallint,,
+,CoachIsExPlayer,bit,,
+,CoachHigherAwardID,int,FK,references AwardDim
+,,,,
+,,,,
+RefundDim,,,,
+,RefundID,int,PK,
+,RefundType,varchar(30),,for example credit card
+,RefundProcessingTime,varchar(25),,number of days in text
+,,,,
+ProviderDim,,,,
+,ProviderID,int,PK,
+,ProviderLocation,int,FK,references locationDim
+,ProviderName,varchar(50),,Name of company
+,,,,
+TicketDim,,,,
+,TicketID,int,PK,
+,TicketEvent,varchar(12),,event type like semifinals
+,TicketType,varchar(6),,
+,,,,
+ClubDim,,,,
+,ClubID,int,PK,
+,ClubLocation,int,FK,references locationDim
+,ClubName,varchar(50),,Esport club name
+,ClubEstDate,date,,date that this club comenced
+,,,,
+AwardDim,,,,
+,AwardID,int,PK,
+,AwardEventID,int,FK,references EventDim
+,AwardValueInPND,int,,pounds PND=pounds
+,,,,
+EventDim,,,,
+,EventID,int,PK,
+,EventName,varchar(12),,
+,EventYear,varchar(4),,
+,EventStartDateID,int,FK,references datedim
+,EventEndDateID,int ,FK,references datedim
+,,,,
+MarketeerDim,,,,
+,MarketeerID,int,PK,
+,MarketeerName,Varchar(50),,
+,,,,
+PromotionDim,,,,
+,PromotionID,int,PK,
+,MarketeerID,int,FK,references marketeerdim
+,PromotionType,varchar(19),,"in other words type of marketing advertisement, for example sales promotions, public relations etc."
+,PromotionEventID,int,FK,references eventdim
+,PromotionDuration,int,,how many days the promotion lasted
+,,,,
+StadiumDim,,,,
+,StadiumID,int,PK,
+,StadiumLocationID,int,FK,references locationdim
+,StadiumName,varchar(26),,
+,StadiumCapacity,int,,
+,StadiumOwner,varchar(58),,
+,,,,
+HighlightDim,,,,"this dimension shows something that worth ""rewatching"" like in football a highlight could be a penalty"
+,HighlightID,int,PK,
+,HighlightType,varchar(14),,
+,,,,
+RefereeDim,,,,
+,RefereeID,int,PK,
+,RefereeOriginID,int,FK,references locationdim
+,RefereeName,varchar(50),,
+,RefereeDoB,date,,
+,RefereeYearsOfExperience,int,,
+,,,,
+PauseDim,,,,
+,PauseID,int,PK,
+,PauseReason,varchar(25),,
+,PauseType,varchar(25),,
+,,,,
+MerchandiseDim,,,,
+,MerchandiseID,int,PK,
+,MerchandiseProviderID,int,FK,references providerdim
+,MerchandiseType,varchar(12),,
+,,,,
+ClubCoachDim,,,,
+,ClubCoachID,int,PK,
+,ClubID,int,FK,references clubdim
+,CoachID,int,FK,references coachdim
+,CoachPosition,varchar(19),,
+,CoachStartDate,date,,date they started working on that club in that position
+,CoachEndDate,date,,date they finished working there. If null assume they still work there either part of full time
+,,,,
+,,,,
+PersonalRecordDim,,,,
+,PRID,int,PK,
+,PRKills,int,,number of kills for the game which can be found in PlayerInGameDim
+,PRAssists,int,,number of assists for the game which can be found in PlayerInGameDim
+,PRDeaths,int,,number of deaths for the game which can be found in PlayerInGameDim
+,,,,
+PlayerDim,,,,
+,PlayerID,int,PK,
+,PlayerOriginID,int,FK,
+,PlayerDoB,date,,
+,PlayerRealName,varchar(50),,
+,PlayerGender,varchar(50),,
+,PlayerFirstAppearance,date,,
+,PlayerGameName,varchar(50),,
+,,,,
+PlayerInGameDim,,,,
+,PlayerInGameID,int,PK,
+,PRID,int,FK,references PersonalRecordDim
+,PlayerID,int,FK,references PlayerDim
+,ChampionID,int,FK,references ChamptionDim
+,GameID,int,FK ,references GameDim
+,ClubID,int,FK,references ClubDim
+,PlayerInGamePositionInGame,varchar(9),,the position the player played in that game
+,,,,
+,,,,
+ChampionInGameSpecDim,,,,this dimension shows the group of items a player bought for their chamption on the corresponding game.
+,ChampionInGameSpecID,int,PK,
+,ChampionItemID,int,FK,references ChampionItemDim
+,PlayerInGameID,int,FK,references PlayerInGameDim
+,,,,
+GameDim,,,,
+,GameID,int,PK,
+,GameStage,varchar(12),,"stage of the game played for example group stage, finals etc"
+,,,,
+GameFact,,,,Includes details about game by game played 
+,EventID,int,PK/FK,references eventdim
+,StadiumID,int,PK/FK,references stadiumdim
+,RefereeID,int,PK/FK,references refereedim
+,GameID,int,PK/FK,references gamedim
+,TimeID,int,PK/FK,references timedim
+,DateID,int,PK/FK,references datedim
+,PauseID,int,FK,references pausedim
+,HighlightID,int,FK,references highlightdim
+,GameDuration,int,,in minutes
+,GameNumberOfPause,int,,how many pauses in this game
+,GameInterruption,int,,how many interruptions per game. It is not the same as pauses
+,GameMinuteOfPause,int,,minute that the pause was initiated
+,GameDurationOfPause,int,,duration of the pause in minutes
+,GameResult,varchar(9),,which team wins blue or red side.
+,,,,
+EventFact,,,,Includes details about every event as a whole
+,EventFactID,int,PK,
+,TicketID,int,FK,references ticketDim
+,EventID,int,FK,references EventDim
+,MerchandiseID,int,FK,references MerchandiseDim
+,PromotionID,int,FK,referneces PromotionDim
+,SpectatorsNumber,int,,referneces PromotionDim
+,VIPSpectatorsNumber,int,,quantity
+,MerchandiseStocked,int,,quantity
+,MerchandiseSold,int,,quantity
+,MerchandiseSoldPND,int,,pounds PND=pounds
+,MerchandiseStockedPND,int,,pounds PND=pounds
+,TicketsSold,int,,quantity
+,TicketsSoldPND,int,,pounds PND=pounds
+,PromotionCost,decimal,,in pounds
+,PromotionRevenue,decimal,,in pounds
+,PromotionDuration,int,,duration in days
+,,,,
+RefundFact,,,,"This includes all refunds, online and offline"
+,RefundFactID,int,PK,
+,DateID,int,FK,references dateDim
+,TicketID,int,FK,references TicketDim
+,MerchandiseID,int,FK,references MerchandiseDim
+,RefundID,int,FK,references RefundDim
+,TicketsRefunded,int,,quantity
+,TicketsRefundedPND,int,,pounds PND=pounds
+,MerchandiseRefunded,int,,quantity
+,MerchandiseRefundedPND,int,,pounds PND=pounds
+,MerchandiseStockedPND,int,,pounds PND=pounds
+,OnlineMerchandiseRefunded,int,,quantity
+,OnlineMerchantiseRefundedPND,int,,pounds PND=pounds
+,,,,
+OnlineSalesFact,,,,
+,DateID,int,PK/FK,
+,MerchandiseID,int,PK/FK,
+,MerchandiseSold,int,,
+,MerchandiseStocked,int,,
+,MerchandiseSoldPND,int,,pounds PND=pounds
+,MerchandiseStockedPND,int,,pounds PND=pounds
