@@ -1,0 +1,53 @@
+# Part 3
+
+**New Dimension 1**: BroadcastDim. Why it's needed: 
+
+Esports is a digital first sport, yet the current schema only captures physical attendance through SpectatorsNumber in EventFact. There is no way to analyse how games are distributed or consumed online across different platforms, languages, or regions. BroadcastDim can help the business identify which platforms and languages attract the largest audiences, supporting media rights negotiations and content decisions.
+
+| Dimension | Attributes | Data type | Identifier | Notes |
+| :---- | :---- | :---- | :---- | :---- |
+| BroadcastDim |  |  |  |  |
+|  | BroadcastID | int | PK |  |
+|  | BroadcastPlatform | varchar(30) |  | E.g. Twitch, Youtube and TikTok etc. |
+|  | BroadcastLanguage | varchar(30) |  | Language of broadcast |
+|  | BroadcastRegionID | int | FK | References locationDim |
+|  | BroadcastType | varchar(20) |  | E.g. Official, Partner, Third party etc. |
+
+**New Dimension 2**: SponsorDim. Why it’s needed:
+
+Sponsorship is one of the largest revenue streams in competitive esports, yet the existing schema has no representation of sponsors or partnership agreements whatsoever. The data captured in this new dimension can help the business to identify underrepresented industries or regions where new sponsorship deals could be pursued. This enables measurement of sponsor value relative to the viewership their associated events generate.
+
+| Dimension | Attributes | Data type | Identifier | Notes |
+| :---- | :---- | :---- | :---- | :---- |
+| SponsorDim |  |  |  |  |
+|  | SponsorID | int | PK |  |
+|  | SponsorName | varchar(60) |  |  |
+|  | SponsorIndustry | varchar(40) |  | E.g. Technology, merchandise etc |
+|  | SponsorTier | varchar(10) |  |  |
+|  | SponsorLocationID | int | FK | References LocationDim |
+
+**New Fact Table**: ViewershipFact. Why it's needed:
+
+The current schema measures physical attendance but has no capability to capture digital viewership, which for most esports events far exceeds physical attendance. It links to existing dimensions and new dimensions. ViewershipFact data allows the business to demonstrate audience reach to sponsors and justify media rights. It directly supports ROI analysis by correlating, viewership figures with the promotion and sponsorship data already stored elsewhere in the warehouse.
+
+| Dimension | Attributes | Data type | Identifier | notes |
+| :---- | :---- | :---- | :---- | :---- |
+| ViewershipFact |  |  |  | Records digital viewership per game per broadcast |
+|  | GameID | int | PK/FK | References GamDim |
+|  | EventID | int | PK/FK | References EventDim |
+|  | BroadcastID | int | PK/FK | References BroadcastDim (new dimension) |
+|  | DateID | int | PK/FK | References DateDim |
+|  | SponsorID | int | FK | References SponsorDim (references new dimension) |
+|  | PeakViewers | int | Not null | Highest concurrent viewers |
+|  | AvgViewers | int |  | Average concurrent viewers |
+|  | UniqueViewers | int |  | Total unique viewers across broadcast |
+|  | TotalHoursWatched | int |  | Cumulative hours watched across all viewers |
+
+**Assumptions**  
+\- Each games are broadcasted simultaneously on multiple platforms (one row per game \+ broadcast combination).
+
+\- A broadcast has one primary sponsor at the game level, though events may have multiple sponsors across different broadcasts.
+
+\- BroadcastRegionID refers to the primary target region of the broadcast, not the physical location of the stream server.
+
+\- Viewership figures are sourced from platform APIs and reported at game granularity.
